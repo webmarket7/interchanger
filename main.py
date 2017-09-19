@@ -1,22 +1,42 @@
 import re
 
-text = 'Миші і ондатри. ВІДКРИВАННЯ і активація. Створили та інсталювали. Я тебе люблю і обожнюю. Вийшов та пішов. Зараз й негайно. Стовп та вогонь. Я спав і не бачив. Ковбаса і сир. Я слухаю музику і іду. Собаки і коти. Риба та м’ясо'
+text = str(input())
 
-previous = ['[^аоуиіиеяюєї]', '[аоуиіиеяюєї]']
-next = ['[аоуиіиеяюєї]', '[^аоуиіиеяюєї]']
 conjunctions = ['і', 'й', 'та']
 
-# Функція приймає вихідний текст і повертає виправлений відповідно до регулярного виразу
+pre = ['[^аоуиіиеяюєї]', '[аоуиіиеяюєї]']
+post = ['[аоуиіиеяюєї]', '[^аоуиіиеяюєї]']
+
+# consonant /i/ vowel, consonant /і/ consonant, vowel /й/ vowel, vowel /та/ consonant 
+
 def interchange(text, start, end, correctConjunction):
   for conjunction in conjunctions:
-    searchStr = r'{}\b\s{}\s\b{}'.format(start, conjunction, end)                   # Складаємо та компілюємо регулярний вираз
-    subStr = r'\s{}\s'.format(conjunction)                                          # для пошуку сполучників між пробілами та голосними/приголосними
-    substrings = re.compile(searchStr, re.IGNORECASE).findall(text)                 # Шукаємо збіги з шаблоном у тексті, ігноруючи регістр
-    for substring in substrings:                                                    # Заміняємо в циклі неправильні сполучники в кожному випадку на правильні
-      result = re.compile(subStr).sub(' ' + correctConjunction + ' ', substring)
+    searchReg = r'{}\b\s{}\s\b{}'.format(start, conjunction, end)                   
+    substrings = re.compile(searchReg, flags = re.I).findall(text)
+    for substring in substrings:
+      subReg = r'\s{}\s'.format(conjunction)
+      result = re.compile(subReg).sub(' ' + correctConjunction + ' ', substring)
       text = text.replace(substring, result)
   corrected = text
-  return corrected                                                                  # Повертаємо виправлений текст
+  return corrected
+
+# .,:;– і (except i)
+exceptions = ['[.,:;\–)]', '[^і]']
+  
+def checkExceptions(text, start, end, correctConjunction):
+  for conjunction in conjunctions:
+    searchReg = r'{}\s{}\s\b{}'.format(start, conjunction, end)                   
+    substrings = re.compile(searchReg, flags = re.I).findall(text)
+    for substring in substrings:
+      if substring[2].isupper():
+        subReg = r'\s{}\s'.format(conjunction.replace(conjunction[0], conjunction[0].upper()))
+        result = re.compile(subReg).sub(' ' + correctConjunction.upper() + ' ', substring)
+      else:
+        subReg = r'\s{}\s'.format(conjunction)
+        result = re.compile(subReg).sub(' ' + correctConjunction + ' ', substring)
+      text = text.replace(substring, result)
+  woExceptions = text
+  return woExceptions  
 
 # Функція для синхронізації третього списка (conjunctions)
 def iter(n):
@@ -28,10 +48,12 @@ def iter(n):
 # Основна функція для чергування і, й, та
 def main(text):
   n = 0
-  for i in range(2):
-    for j in range(2):
-      text = interchange(text, previous[i], next[j], conjunctions[iter(n)])
+  for start in pre:
+    for end in post:
+      text = interchange(text, start, end, conjunctions[iter(n)])
       n += 1
+  text = checkExceptions(text, exceptions[0], exceptions[1], conjunctions[0])
   print(text)
 
 main(text)
+
