@@ -2,10 +2,8 @@ import re, json
 from itertools import chain
 from collections import Counter
 
-
-# TODOS:
-# 1. Implement logic for tag processor
-# 2. Implement logic for interchange within a sentence
+print("Content-Type: text/html; charset=utf-8")
+print("")
 
 class Options(object):
   
@@ -20,6 +18,15 @@ class Text(object):
   def __init__(self, text):
     self.text = text
     self.sentences = self.breakInSentences()
+  
+  def parse(self):
+    segments = re.findall(r'\(-:(.+)\)=\d+?%\((.+):-\)', self.text, flags = re.M)
+    targets = []
+    for segment in segments:
+      target = re.sub(r'<[^>]+>', ' ', segment[1])
+      target = re.sub(' +', ' ', target).strip(' ')
+      targets.append(target)
+    return targets
     
   def breakInSentences(self):
     return list(map(lambda s: s.strip(' '), re.findall(r'.+?[.:;?!]|.+', self.text, flags = re.M)))
@@ -44,7 +51,6 @@ class Sentence(object):
       counted = dict(Counter(subjunctions))
       for subj in ['й', 'і']:
         if subj in counted.keys() and counted.get(subj) >= 2:
-          # note = 'NOTE. There are', counted.get(subj), ' occurences of  \"' + subj + '\" in this segment. It is recommended to use preposition \"та\" if a sentence already contains preposition \"й\" or \"і\".'
           warnings.append((subj, counted.get(subj)))
     if len(warnings) > 0:
       return True
@@ -292,26 +298,23 @@ def check(string):
   options = Options()
   text = Text(string)
   output = []
+  number = 0
   for element in text.sentences:
+    number += 1
     sentence = Sentence(element)
     original = sentence.content
     reviewed = sentence.content
     cases = sentence.findCases(options.lwSet)
     if any(cases):
+      changed = True
       cases = list(map(Rule, cases))
       corrections = countCorrections(cases)
       for case in cases:
         original = case.highlight(original)
         reviewed = case.applyRule(reviewed)
+    else: 
+      corrections = 0
+      changed = False
     warnings = Sentence(reviewed).performQA()
-    output.append({'original': original, 'warnings': warnings, 'reviewed': reviewed, 'corrections': corrections})
-  encoded = json.dumps(output, ensure_ascii=False)
-  print(encoded)
-  # with open('data.txt', 'w') as outfile:
-  #   json.dump(output, outfile)
-
-  
-    
-myString = '''Я маю що сказати і чому. У Маші вдома живуть кіт та собака. Відкриється електронна таблиця для перевірки розрахунку й автоматично обчислить математичні вирази. Кабелі, датчики та інше допоміжне обладнання, для яких необхідна електромагнітна сумісність, перелічено в документації з експлуатації, яка входить в комплект постачання цього продукту. Завантажувальний накопичувач, масив RAID 5 із 3 накопичувачів і один запасний накопичувач для масиву RAID. Отака в нас біда\nНі туди, і ні сюди. Шукаємо баги й упиваємося свободою, стріляємо й охаємо. Втомились і лягли, а тоді навідпочивались і встали.'''
-      
-check(myString)
+    output.append({'number': number, 'original': original, 'warnings': warnings, 'reviewed': reviewed, 'corrections': corrections, 'changed': changed})
+  return output

@@ -1,59 +1,36 @@
 <template>
   <div id="app">
-      <div class="container">
-          <main-menu></main-menu>
-          <div class="row">
-              <div class="col-md-12">
-                  <transition name="fade" mode="out-in">
-                      <component :is="selectedComponent"></component>
-                  </transition>
-              </div>
-          </div>
-      </div>
+      <app-header></app-header>
+      <app-workpanel></app-workpanel>
+      <app-footer></app-footer>
   </div>
 </template>
 
 <script>
-  import TextInput from './components/textInput.vue';
-  import ResultOutput from './components/resultOutput.vue';
-  import MainMenu from './components/mainMenu.vue';
+    import Workpanel from './components/workpanel.vue';
+    import Header from './components/header.vue';
+    import Footer from './components/footer.vue';
 
-  export default {
-      name: 'app',
-      computed: {
-        selectedComponent() {
-            return this.$store.getters.getComponent;
+    export default {
+        name: 'app',
+        computed: {
+            selectedComponent() {
+                return this.$store.getters.getComponent;
+            }
+        },
+        components: {
+            'app-header': Header,
+            'app-workpanel': Workpanel,
+            'app-footer': Footer
         }
-      },
-      components: {
-          'text-input': TextInput,
-          'result-output': ResultOutput,
-          'main-menu': MainMenu
-      }
-  }
+    }
 </script>
 
 <style>
-
-    #app {
-        margin: 50px 0;
-    }
-
     .correct {
         background-color: #98FB98;
     }
-
     .wrong {
         background-color: #FF6347;
     }
-
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity .5s ease;
-    }
-    .fade-enter, .fade-leave-to
-        /* .component-fade-leave-active below version 2.1.8 */ {
-        opacity: 0;
-    }
-
-
 </style>

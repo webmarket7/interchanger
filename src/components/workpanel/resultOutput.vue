@@ -1,10 +1,15 @@
 <template>
     <div>
         <div class="panel panel-info">
-            <div class="panel-heading cpanel">
-                <label for="filter"><img src="../assets/filter.png" alt="Filter" class="img-responsive"></label>
-                <select id="filter" class="form-control" v-model="selectedFilter">
-                    <option class="option" v-for="filter in filters" :selected="filter =='All'">{{ filter }}</option>
+            <div class="panel-heading flex-container">
+                <label for="filter">
+                    <img src="../../assets/filter.png" alt="Filter" class="img-responsive">
+                </label>
+                <select id="filter"
+                        class="form-control"
+                        v-model="selectedFilter">
+                    <option v-for="filter in filters"
+                            :selected="filter =='All'">{{ filter }}</option>
                 </select>
                 <div class="errors">Errors: <span>{{ errors }}</span></div>
             </div>
@@ -15,7 +20,7 @@
                             <tr v-for='segment in filtered'>
                                 <td class="number">{{ segment.number }}.</td>
                                 <td v-html="segment.original"></td>
-                                <td class="warnings"><img src="../assets/warning.png" alt="Warning!" title="It is recommended to use preposition 'та' if a sentence already contains preposition 'й\і!'" v-if="segment.warnings"></td>
+                                <td class="warnings"><img src="../../assets/warning.png" alt="Warning!" title="It is recommended to use preposition 'та' if a sentence already contains preposition 'й\і!'" v-if="segment.warnings"></td>
                                 <td v-html="segment.reviewed"></td>
                                 <td class="corrections">{{ segment.corrections }}</td>
                             </tr>
@@ -70,52 +75,36 @@
                 }
                 return corrections;
             }
-        },
-        created() {
-            console.log(this.$store.getters.getText);
         }
     }
 </script>
 
 <style scoped>
-
-    .cpanel {
+    .flex-container {
         display: flex;
-        flex-direction: row;
     }
-
     label, select, .errors {
         display: flex;
         align-items: center;
     }
-
     label img {
         margin-right:5px;
     }
-
     select {
         width: 20%;
     }
-
-    .option {
-        padding: 5px;
-    }
-
     .errors {
         font-weight: bold;
         font-size: 1.1em;
         margin-left: auto;
     }
-
     .errors span {
         font-weight: normal;
         margin-left: 5px;
     }
-
     td {
         padding: 8px;
     }
-
     .number, .warnings, .corrections {
         text-align: center;
     }
