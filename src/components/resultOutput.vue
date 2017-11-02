@@ -1,5 +1,5 @@
 <template>
-    <div v-if="isDisplayed">
+    <div>
         <div class="panel panel-info">
             <div class="panel-heading cpanel">
                 <label for="filter"><img src="../assets/filter.png" alt="Filter" class="img-responsive"></label>
@@ -28,26 +28,17 @@
 </template>
 
 <script>
-    import { eventBus } from '../main'
     export default {
         data() {
             return {
-                segments: [],
                 selectedFilter: 'All',
-                filters: ['All', 'Detected', 'Errors only', 'Correct only', 'Warnings'],
-                isDisplayed: false
+                filters: ['All', 'Detected', 'Errors only', 'Correct only', 'Warnings']
             }
         },
-        created() {
-            eventBus.$on('textWasSubmitted', (txt) => {
-                this.segments = JSON.parse(text.value);
-                this.isDisplayed = true
-            });
-            eventBus.$on('newDocument', (isCreated) => {
-                this.isDisplayed = false
-            });
-        },
         computed: {
+            segments() {
+                return JSON.parse(this.$store.getters.getText);
+            },
             filtered() {
               if (this.selectedFilter == 'All') {
                   return this.segments
@@ -79,6 +70,9 @@
                 }
                 return corrections;
             }
+        },
+        created() {
+            console.log(this.$store.getters.getText);
         }
     }
 </script>

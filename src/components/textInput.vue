@@ -1,9 +1,9 @@
 <template>
         <form>
-            <div class="form-group" v-if="isDisplayed">
+            <div class="form-group">
                 <textarea name="text" id="text" rows="20" placeholder="Please input text here…" v-model.lazy="text"></textarea>
                 <div class="cpanel">
-                    <button class="btn btn-primary button" @click.prevent="submitted">Submit</button>
+                    <button class="btn btn-primary button" @click.prevent="check(text)">Check</button>
                     <button type="reset" class="btn btn-warning button">Clear</button>
                 </div>
             </div>
@@ -11,8 +11,6 @@
 </template>
 
 <script>
-    import { eventBus } from '../main';
-
     export default {
         data: function() {
             return {
@@ -21,16 +19,9 @@
             }
         },
         methods: {
-            submitted: function () {
-                this.isDisplayed = false;
-                eventBus.$emit('textWasSubmitted', this.text);
-                text = ''
+            check(text) {
+                this.$store.dispatch('check', text)
             }
-        },
-        created() {
-            eventBus.$on('newDocument', (isCreated) => {
-                this.isDisplayed = true;
-            });
         }
     }
 </script>
