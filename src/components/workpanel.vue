@@ -35,7 +35,7 @@
 <style scoped>
     .container {
         margin-top: 100px;
-        min-height: calc(100vh - 170px);
+        min-height: calc(100vh - 175px);
     }
     .fade-enter-active, .fade-leave-active {
         transition: opacity .5s ease;
